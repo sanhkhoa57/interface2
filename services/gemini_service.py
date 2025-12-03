@@ -7,7 +7,13 @@ from dotenv import load_dotenv
 @st.cache_resource #@st.cache_resource để đảm bảo Key chỉ được gọi 1 lần duy nhất
 def initialize_gemini():
     load_dotenv()
-    api_key = os.getenv("GEMINI_API_KEY")
+    try:
+        api_key = st.secrets.get("GEMINI_API_KEY")
+    except Exception:
+        api_key = None
+    
+    if not api_key:
+        api_key = os.getenv("GEMINI_API_KEY")
     
     if not api_key or api_key.startswith("DÁN_KEY"):
         st.error("LỖI CẤU HÌNH: Vui lòng dán API Key vào file .env")
