@@ -57,7 +57,7 @@ if mode == "Texting":
                         st.metric("Yêu thích", info['favorites'])
                     with col2:
                         st.header(info['name'])
-                        st.success(ai_text, icon="⛩️🌸🍥☯🍜")
+                        st.success(ai_text, icon="🐱")
         else:
             st.warning("Không tìm thấy nhân vật nào!")
 # CHẾ ĐỘ 2: UPLOAD ẢNH (VISION)
@@ -96,7 +96,7 @@ elif mode == "Uploading":
                         st.header(info['name'])
                         st.write(f"**Tên tiếng Nhật:** {info.get('name_kanji', 'N/A')}")
                         st.markdown("### 📝 Báo cáo phân tích từ AI")
-                        st.success(ai_text, icon="❟❛❟ ⚛ ✇ ")
+                        st.success(ai_text, icon="📝")
                         
                 else:
                     # nếu Jikan không tìm thấy data của tên mà AI đoán ra
