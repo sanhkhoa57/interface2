@@ -330,3 +330,4 @@ def add_corner_gif():
     </style>
     <img src="https://s3.getstickerpack.com/storage/uploads/sticker-pack/genshin-stickers-set-44/sticker_1.png?9fea17fd7eb9063146bb3e6c6cc33beb" class="corner-gif" alt="cute gif">
     """
+    st.markdown(gif_html, unsafe_allow_html=True)
