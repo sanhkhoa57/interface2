@@ -2,7 +2,7 @@ import streamlit as st
 import base64
 import os
 
-# cấu hình của AI
+# cấu hình của web
 LOCAL_WEBP_FILE = "utsuro.webp" 
 
 # ảnh nền Anime mẫu (fallback nếu không tìm thấy file local)
