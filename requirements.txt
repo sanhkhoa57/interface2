@@ -1,14 +1,5 @@
-<<<<<<< HEAD
 streamlit
 requests
 google-generativeai
 python-dotenv
 pillow
-
-=======
-streamlit
-requests
-google-generativeai
-python-dotenv
-pillow
->>>>>>> eb80681a56c9ad3134888de4191995202dbdce75
