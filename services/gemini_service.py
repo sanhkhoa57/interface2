@@ -2,6 +2,9 @@ import google.generativeai as genai
 import os
 import streamlit as st # IMPORT STREAMLIT
 from dotenv import load_dotenv
+from PIL import Image  # ← THÊM DÒNG NÀY
+import requests  # ← THÊM DÒNG NÀY
+from io import BytesIO  # ← THÊM DÒNG NÀY
 
 # Code API function
 @st.cache_resource #@st.cache_resource để đảm bảo Key chỉ được gọi 1 lần duy nhất
@@ -71,3 +74,136 @@ def ai_analyze_profile(char_info):
         return response.text
     except Exception as e:
         return f"Xin lỗi, AI đang bị lỗi kết nối/timeout: {e}"
+def generate_custom_avatar(avatar_config, face_reference=None):
+    """
+    Tạo avatar anime sử dụng Pollinations.AI API (MIỄN PHÍ - KHÔNG CẦN KEY)
+    
+    Args:
+        avatar_config: Dict chứa toàn bộ config
+        face_reference: PIL Image của user (optional)
+    
+    Returns:
+        PIL Image hoặc None
+    """
+    
+    # Build prompt từ config
+    prompt_parts = []
+    
+    # Art style
+    art_style_prompts = {
+        "Anime style chuẩn": "anime style",
+        "Chibi siêu cute": "chibi cute kawaii",
+        "Makoto Shinkai style": "makoto shinkai style",
+        "Studio Ghibli style": "studio ghibli style",
+        "Manga đen trắng": "manga monochrome",
+        "Watercolor mềm mại": "watercolor anime",
+        "Kyoto Animation style": "kyoto animation style",
+        "Vtuber style": "vtuber style",
+        "Webtoon style": "webtoon style"
+    }
+    prompt_parts.append(art_style_prompts.get(avatar_config["art_style"], "anime"))
+    
+    # Character
+    gender_map = {"Nữ": "1girl", "Nam": "1boy", "Non-binary": "androgynous person"}
+    prompt_parts.append(gender_map[avatar_config['gender']])
+    
+    # Hair
+    prompt_parts.append(f"{avatar_config['hair_color']} {avatar_config['hair_style']}")
+    
+    # Eyes
+    prompt_parts.append(f"{avatar_config['eye_color']} eyes")
+    
+    # Outfit
+    prompt_parts.append(f"wearing {avatar_config['outfit_type']}")
+    
+    # Expression
+    expression_map = {
+        "Mặc định/Bình thường": "neutral",
+        "Cười tươi rói": "smiling",
+        "Cười ngượng đỏ mặt": "blushing shy",
+        "Ngầu lạnh lùng": "cool",
+        "Buồn lo lắng": "sad",
+        "Giận dữ tsundere": "angry tsundere",
+        "Wink một mắt": "winking",
+        "Shocked/Ngạc nhiên": "surprised",
+        "Tự tin badass": "confident"
+    }
+    prompt_parts.append(expression_map[avatar_config["expression"]])
+    
+    # Background
+    bg_map = {
+        "Trong suốt (PNG)": "white background",
+        "Lớp học Nhật Bản": "classroom",
+        "Sân thượng trường học": "rooftop",
+        "Vườn hoa anh đào": "cherry blossoms",
+        "Thành phố về đêm": "city night",
+        "Bãi biển hoàng hôn": "beach sunset",
+        "Rừng huyền bí": "forest",
+        "Phòng ngủ cute": "bedroom",
+        "Phố Shibuya đông người": "shibuya",
+        "Trạm tàu điện": "train station",
+        "Công viên mùa thu": "autumn park",
+        "Cầu thang Your Name": "stairs sunset",
+        "Không gian ảo cyberpunk": "cyberpunk"
+    }
+    prompt_parts.append(bg_map.get(avatar_config["background"], "simple background"))
+    
+    # Final prompt - NGẮN GỌN
+    full_prompt = ", ".join(prompt_parts) + ", high quality, detailed"
+    
+    st.info(f"🎨 Đang tạo avatar với prompt: {full_prompt[:100]}...")
+    
+    try:
+        import urllib.parse
+        
+        # Encode prompt
+        encoded_prompt = urllib.parse.quote(full_prompt)
+        
+        # ✅ POLLINATIONS API - CHÍNH XÁC 100%
+        url = f"https://image.pollinations.ai/prompt/{encoded_prompt}"
+        
+        # Parameters
+        params = {
+            "width": 512,
+            "height": 768,
+            "model": "flux",  # flux model tốt cho anime
+            "nologo": "true",
+            "enhance": "true"
+        }
+        
+        # Build full URL
+        param_str = "&".join([f"{k}={v}" for k, v in params.items()])
+        full_url = f"{url}?{param_str}"
+        
+        st.info("⏳ Đang gửi request đến Pollinations.AI...")
+        
+        # GET request
+        response = requests.get(full_url, timeout=90)
+        
+        if response.status_code == 200:
+            # Kiểm tra content type
+            content_type = response.headers.get('content-type', '')
+            
+            if 'image' in content_type:
+                image = Image.open(BytesIO(response.content))
+                st.success("✅ Tạo avatar thành công!")
+                return image
+            else:
+                st.error(f"❌ Response không phải ảnh. Content-Type: {content_type}")
+                st.error(f"Response: {response.text[:200]}")
+                return None
+        else:
+            st.error(f"❌ Lỗi API: {response.status_code}")
+            st.error(f"Response: {response.text[:200]}")
+            return None
+            
+    except requests.exceptions.Timeout:
+        st.error("⏰ Timeout! Server mất quá lâu để xử lý.")
+        st.info("💡 Thử giảm độ phức tạp hoặc chọn style đơn giản hơn")
+        return None
+        
+    except Exception as e:
+        st.error(f"❌ Lỗi: {str(e)}")
+        st.info("💡 Debug info:")
+        st.code(f"URL: {full_url}")
+        return None
