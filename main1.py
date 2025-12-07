@@ -70,7 +70,7 @@ st.markdown("---")
 with st.sidebar:
     st.header("Which tool?")
     mode = st.radio("Tell me what you need", ["Texting", "Uploading", "Genre", "Avatar Creator", "Favorite", "History"])
-    st.info("A-I-T Model - Tứ Đại Bổ Ách")
+    st.info("A-I-T Model - Tứ Đại Bổ Ích")
 
 # MODE 1: TEXTING
 if mode == "Texting":
