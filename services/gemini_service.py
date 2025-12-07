@@ -154,29 +154,40 @@ def generate_custom_avatar(avatar_config, face_reference=None):
     st.info(f"🎨 Đang tạo avatar với prompt: {full_prompt[:100]}...")
     
     try:
+        # import urllib.parse
+        
+        # # Encode prompt
+        # encoded_prompt = urllib.parse.quote(full_prompt)
+        
+        # # ✅ POLLINATIONS API - CHÍNH XÁC 100%
+        # url = f"https://image.pollinations.ai/prompt/{encoded_prompt}"
+        
+        # # Parameters
+        # params = {
+        #     "width": 512,
+        #     "height": 768,
+        #     "model": "flux",  # flux model tốt cho anime
+        #     "nologo": "true",
+        #     "enhance": "true"
+        # }
+        
+        # # Build full URL
+        # param_str = "&".join([f"{k}={v}" for k, v in params.items()])
+        # full_url = f"{url}?{param_str}"
+
         import urllib.parse
-        
-        # Encode prompt
+
         encoded_prompt = urllib.parse.quote(full_prompt)
-        
-        # ✅ POLLINATIONS API - CHÍNH XÁC 100%
+
+        # API hợp lệ
         url = f"https://image.pollinations.ai/prompt/{encoded_prompt}"
-        
-        # Parameters
-        params = {
-            "width": 512,
-            "height": 768,
-            "model": "flux",  # flux model tốt cho anime
-            "nologo": "true",
-            "enhance": "true"
-        }
-        
-        # Build full URL
-        param_str = "&".join([f"{k}={v}" for k, v in params.items()])
-        full_url = f"{url}?{param_str}"
-        
+
+        # Width/height: vẫn được
+        full_url = f"{url}?width=512&height=768"
+
+
         st.info("⏳ Đang gửi request đến Pollinations.AI...")
-        
+        print(full_url)
         # GET request
         response = requests.get(full_url, timeout=90)
         
